@@ -50,7 +50,7 @@
   :group 'posframe
   :type 'boolean)
 
-(defcustom posframe-mouse-banish-function #'posframe-mouse-banish-default
+(defcustom posframe-mouse-banish-function (lambda ())
   "The function used to banish mouse.
 
 Function `posframe-mouse-banish-default' will work well in most
@@ -129,22 +129,22 @@ effect.")
 
 (cl-defun posframe--create-posframe (buffer-or-name
                                      &key
-                                     parent-frame
-                                     foreground-color
-                                     background-color
-                                     left-fringe
-                                     right-fringe
-                                     border-width
-                                     border-color
-                                     internal-border-width
-                                     internal-border-color
-                                     font
-                                     keep-ratio
-                                     lines-truncate
-                                     override-parameters
-                                     respect-header-line
-                                     respect-mode-line
-                                     accept-focus)
+                                       parent-frame
+                                       foreground-color
+                                       background-color
+                                       left-fringe
+                                       right-fringe
+                                       border-width
+                                       border-color
+                                       internal-border-width
+                                       internal-border-color
+                                       font
+                                       keep-ratio
+                                       lines-truncate
+                                       override-parameters
+                                       respect-header-line
+                                       respect-mode-line
+                                       accept-focus)
   "Create and return a posframe child frame.
 This posframe's buffer is BUFFER-OR-NAME.
 
@@ -306,40 +306,40 @@ ACCEPT-FOCUS."
 ;;;###autoload
 (cl-defun posframe-show (buffer-or-name
                          &key
-                         string
-                         position
-                         poshandler
-                         poshandler-extra-info
-                         width
-                         height
-                         max-width
-                         max-height
-                         min-width
-                         min-height
-                         x-pixel-offset
-                         y-pixel-offset
-                         left-fringe
-                         right-fringe
-                         border-width
-                         border-color
-                         internal-border-width
-                         internal-border-color
-                         font
-                         foreground-color
-                         background-color
-                         respect-header-line
-                         respect-mode-line
-                         initialize
-                         no-properties
-                         keep-ratio
-                         lines-truncate
-                         override-parameters
-                         timeout
-                         refresh
-                         accept-focus
-                         hidehandler
-                         refposhandler
-                         &allow-other-keys)
+                           string
+                           position
+                           poshandler
+                           poshandler-extra-info
+                           width
+                           height
+                           max-width
+                           max-height
+                           min-width
+                           min-height
+                           x-pixel-offset
+                           y-pixel-offset
+                           left-fringe
+                           right-fringe
+                           border-width
+                           border-color
+                           internal-border-width
+                           internal-border-color
+                           font
+                           foreground-color
+                           background-color
+                           respect-header-line
+                           respect-mode-line
+                           initialize
+                           no-properties
+                           keep-ratio
+                           lines-truncate
+                           override-parameters
+                           timeout
+                           refresh
+                           accept-focus
+                           hidehandler
+                           refposhandler
+                           &allow-other-keys)
   "Pop up a posframe to show STRING at POSITION.
 
  (1) POSITION
@@ -702,29 +702,29 @@ You can use `posframe-delete-all' to delete all posframes."
                              (cons parent-buffer-name parent-buffer)))
 
       ;; Mouse banish
-      (funcall
-       posframe-mouse-banish-function
-       (list :parent-frame parent-frame
-             :mouse-x (when (car mouse-position)
-                        (+ (or (car ref-position) 0)
-                           (car mouse-position)))
-             :mouse-y (when (cdr mouse-position)
-                        (+ (or (cdr ref-position) 0)
-                           (cdr mouse-position)))
-             :posframe-x
-             (if (>= (car position) 0)
-                 (car position)
-               (- (frame-pixel-width parent-frame)
-                  (frame-pixel-width posframe)))
-             :posframe-y
-             (if (>= (cdr position) 0)
-                 (cdr position)
-               (- (frame-pixel-height parent-frame)
-                  (frame-pixel-height posframe)))
-             :posframe-width (frame-pixel-width posframe)
-             :posframe-height (frame-pixel-height posframe)
-             :parent-frame-width parent-frame-width
-             :parent-frame-height parent-frame-height))
+      ;; (funcall
+      ;;  posframe-mouse-banish-function
+      ;;  (list :parent-frame parent-frame
+      ;;        :mouse-x (when (car mouse-position)
+      ;;                   (+ (or (car ref-position) 0)
+      ;;                      (car mouse-position)))
+      ;;        :mouse-y (when (cdr mouse-position)
+      ;;                   (+ (or (cdr ref-position) 0)
+      ;;                      (cdr mouse-position)))
+      ;;        :posframe-x
+      ;;        (if (>= (car position) 0)
+      ;;            (car position)
+      ;;          (- (frame-pixel-width parent-frame)
+      ;;             (frame-pixel-width posframe)))
+      ;;        :posframe-y
+      ;;        (if (>= (cdr position) 0)
+      ;;            (cdr position)
+      ;;          (- (frame-pixel-height parent-frame)
+      ;;             (frame-pixel-height posframe)))
+      ;;        :posframe-width (frame-pixel-width posframe)
+      ;;        :posframe-height (frame-pixel-height posframe)
+      ;;        :parent-frame-width parent-frame-width
+      ;;        :parent-frame-height parent-frame-height))
 
       ;; Return posframe
       posframe)))
@@ -746,51 +746,51 @@ You can use `posframe-delete-all' to delete all posframes."
             (cons position height))
       height)))
 
-(defun posframe-mouse-banish-simple (info)
-  "Banish mouse to (0, 0) of posframe base on INFO."
-  (let ((parent-frame (plist-get info :parent-frame))
-        (x (plist-get info :posframe-x))
-        (y (plist-get info :posframe-y))
-        (w (plist-get info :posframe-width))
-        (h (plist-get info :posframe-height))
-        (p-w (plist-get info :parent-frame-width))
-        (p-h (plist-get info :parent-frame-height)))
-    (set-mouse-pixel-position
-     parent-frame
-     (if (= x 0)
-         (min p-w (+ w 5))
-       (max 0 (- x 5)))
-     (if (= y 0)
-         (min p-h (+ h 10))
-       (max 0 (- y 10))))))
+;; (defun posframe-mouse-banish-simple (info)
+;;   "Banish mouse to (0, 0) of posframe base on INFO."
+;;   (let ((parent-frame (plist-get info :parent-frame))
+;;         (x (plist-get info :posframe-x))
+;;         (y (plist-get info :posframe-y))
+;;         (w (plist-get info :posframe-width))
+;;         (h (plist-get info :posframe-height))
+;;         (p-w (plist-get info :parent-frame-width))
+;;         (p-h (plist-get info :parent-frame-height)))
+;;     (set-mouse-pixel-position
+;;      parent-frame
+;;      (if (= x 0)
+;;          (min p-w (+ w 5))
+;;        (max 0 (- x 5)))
+;;      (if (= y 0)
+;;          (min p-h (+ h 10))
+;;        (max 0 (- y 10))))))
 
-(defun posframe-mouse-banish-default (info)
-  "Banish mouse base on INFO.
+;; (defun posframe-mouse-banish-default (info)
+;;   "Banish mouse base on INFO.
 
-FIXME: This is a hacky fix for the mouse focus problem, which like:
-https://github.com/tumashu/posframe/issues/4#issuecomment-357514918"
-  (let* ((parent-frame (plist-get info :parent-frame))
-         (m-x (plist-get info :mouse-x))
-         (m-y (plist-get info :mouse-y))
-         (x (plist-get info :posframe-x))
-         (y (plist-get info :posframe-y))
-         (w (plist-get info :posframe-width))
-         (h (plist-get info :posframe-height))
-         (p-w (plist-get info :parent-frame-width))
-         (p-h (plist-get info :parent-frame-height)))
-    (when (and m-x m-y
-               (>= m-x x)
-               (<= m-x (+ x w))
-               (>= m-y y)
-               (<= m-y (+ y h)))
-      (set-mouse-pixel-position
-       parent-frame
-       (if (= x 0)
-           (min p-w (+ w 5))
-         (max 0 (- x 5)))
-       (if (= y 0)
-           (min p-h (+ h 10))
-         (max 0 (- y 10)))))))
+;; FIXME: This is a hacky fix for the mouse focus problem, which like:
+;; https://github.com/tumashu/posframe/issues/4#issuecomment-357514918"
+;;   (let* ((parent-frame (plist-get info :parent-frame))
+;;          (m-x (plist-get info :mouse-x))
+;;          (m-y (plist-get info :mouse-y))
+;;          (x (plist-get info :posframe-x))
+;;          (y (plist-get info :posframe-y))
+;;          (w (plist-get info :posframe-width))
+;;          (h (plist-get info :posframe-height))
+;;          (p-w (plist-get info :parent-frame-width))
+;;          (p-h (plist-get info :parent-frame-height)))
+;;     (when (and m-x m-y
+;;                (>= m-x x)
+;;                (<= m-x (+ x w))
+;;                (>= m-y y)
+;;                (<= m-y (+ y h)))
+;;       (set-mouse-pixel-position
+;;        parent-frame
+;;        (if (= x 0)
+;;            (min p-w (+ w 5))
+;;          (max 0 (- x 5)))
+;;        (if (= y 0)
+;;            (min p-h (+ h 10))
+;;          (max 0 (- y 10)))))))
 
 (defun posframe--redirect-posframe-focus ()
   "Redirect focus from the posframe to the parent frame.
@@ -802,10 +802,22 @@ window manager selects it."
              (not posframe--accept-focus))
     (redirect-frame-focus posframe--frame (frame-parent))))
 
+;; build from this if the pre-command hooks cause some freeze or sth
+;; (defvar posframe--redirect-posframe-focus2-commands
+;;   '(self-insert-command
+;;     newline
+;;     ))
+;; (defun posframe--redirect-posframe-focus2 ()
+;; (when (eq last-command 'self-insert-command)
+;;   (posframe--redirect-posframe-focus)))
+;; pre-command-hooks mostly hunch/paranoia
+
 (if (version< emacs-version "27.1")
     (with-no-warnings
-      (add-hook 'focus-in-hook #'posframe--redirect-posframe-focus))
-  (add-function :after after-focus-change-function #'posframe--redirect-posframe-focus))
+      (add-hook 'focus-in-hook #'posframe--redirect-posframe-focus)
+      (add-hook 'pre-command-hook #'posframe--redirect-posframe-focus))
+  (add-function :after after-focus-change-function #'posframe--redirect-posframe-focus)
+  (add-hook 'pre-command-hook #'posframe--redirect-posframe-focus))
 
 (defun posframe--insert-string (string no-properties)
   "Insert STRING to current buffer.
@@ -1109,13 +1121,13 @@ of `posframe-show'."
                 (+ ref-y y)))))))
 
 (cl-defun posframe-poshandler-argbuilder (&optional
-                                          child-frame
+                                            child-frame
                                           &key
-                                          position
-                                          poshandler
-                                          refposhandler
-                                          x-pixel-offset
-                                          y-pixel-offset)
+                                            position
+                                            poshandler
+                                            refposhandler
+                                            x-pixel-offset
+                                            y-pixel-offset)
   "Return a info list of CHILD-FRAME, used as poshandler's info argument.
 
 if CHILD-FRAME is nil, parent frame will use selected frame.  The
@@ -1173,6 +1185,8 @@ Optional argument: REFPOSHANDLER."
           :parent-window-width parent-window-width
           :parent-window-height parent-window-height
           :mode-line-height mode-line-height
+          ;; TODO new
+          :minibuffer-exit t
           :minibuffer-height minibuffer-height
           :header-line-height header-line-height
           :tab-line-height tab-line-height
@@ -1191,6 +1205,7 @@ of `posframe-show'."
     (cons (+ (car position) x-pixel-offset)
           (+ (cdr position) y-pixel-offset))))
 
+(defvar posframe-poshandler-point-1-last-pos nil)
 (defun posframe-poshandler-point-1 (info &optional font-height upward)
   "The internal function used to deal with point-poshandler.
 Argument INFO .
@@ -1229,6 +1244,12 @@ Optional arguments: FONT-HEIGHT and UPWARD."
                    y-pixel-offset))
          (font-height (or font-height (plist-get info :font-height)))
          (y-bottom (+ y-top font-height)))
+    (setq posframe-poshandler-point-1-last-pos (cons (max 0 (min x (- xmax (or posframe-width 0))))
+                                                     (max 0 (if (if upward
+                                                                    (> (- y-bottom (or posframe-height 0)) 0)
+                                                                  (> (+ y-bottom (or posframe-height 0)) ymax))
+                                                                (- y-top (or posframe-height 0))
+                                                              y-bottom))))
     (cons (max 0 (min x (- xmax (or posframe-width 0))))
           (max 0 (if (if upward
                          (> (- y-bottom (or posframe-height 0)) 0)
