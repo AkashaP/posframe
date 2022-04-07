@@ -31,7 +31,7 @@
 ;; child-frame connected to its root window's buffer.
 
 ;; The main advantages are:
-;; 1. It is fast enough for daily usage :-)
+;; 1. It is fast enough for daily usage c:
 ;; 2. It works well with CJK languages.
 
 ;; More info please see: README.org
@@ -277,6 +277,7 @@ ACCEPT-FOCUS."
              posframe--frame 'background-color
              (or background-color (face-attribute 'default :background)))))
         (let ((posframe-window (frame-root-window posframe--frame)))
+        (set-window-parameter posframe-window 'no-other-window t) 
           ;; This method is more stable than 'setq mode/header-line-format nil'
           (unless respect-mode-line
             (set-window-parameter posframe-window 'mode-line-format 'none))
